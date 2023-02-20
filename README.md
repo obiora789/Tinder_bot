@@ -35,11 +35,10 @@ This bot automates the process of finding a date on Tinder, by logging into Tind
 <p>Once a match is found, the bot initiates the conversation automatically.</p>
 <hr>
 <h3>Results</h3>
-<img src="https://twitter.com/md_changer/status/1627660352887422976/photo/1" alt="tinderLoginPage.jpg">
-<img src="https://twitter.com/md_changer/status/1627660352887422976/photo/2" alt="loginThroughGmail.jpg">
-<img src="https://twitter.com/md_changer/status/1627660352887422976/photo/3" alt="loginSuccessful.jpg">
-<img src="https://twitter.com/md_changer/status/1627660352887422976/photo/4" alt="analyzingAccount.jpg">
-
+<img src="https://github.com/obiora789/Tinder_bot/blob/obiora789-patch-1/.idea/Screenshot%202023-02-20%20at%2013.26.56.png" alt="tinderLoginPage.jpg">
+<img src="https://github.com/obiora789/Tinder_bot/blob/obiora789-patch-1/.idea/Screenshot%202023-02-20%20at%2013.27.03.png" alt="loginThroughGmail.jpg">
+<img src="https://github.com/obiora789/Tinder_bot/blob/obiora789-patch-1/.idea/Screenshot%202023-02-20%20at%2013.27.36.png" alt="loginSuccessful.jpg">
+<img src="https://github.com/obiora789/Tinder_bot/blob/obiora789-patch-1/.idea/tinder.jpg" alt="analyzingAccount.jpg">
 <hr>
 <h3>Bugs</h3>
 <p>None as at the time of this report.</p>
