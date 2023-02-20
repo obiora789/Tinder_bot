@@ -1,10 +1,9 @@
 import undetected_chromedriver as uc
-# from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -21,7 +20,6 @@ TINDER_URL = "https://tinder.com/"
 CHROME_DRIVER = os.environ.get("CHROME_PATH")
 EMAIL = os.environ.get("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
-MOBILE_NUMBER = os.environ.get("MOBILE")
 SERVICE = Service(executable_path=CHROME_DRIVER)
 LONG = 2
 SHORT = 3
@@ -46,8 +44,6 @@ def email_address():
     actions.move_to_element(next_).perform()
     time.sleep(DELAY - generate_random_time(LONG))
     actions.click(on_element=next_).perform()
-    # next_.click()
-    # driver.execute_script("arguments[0].click();", next_)
 
 
 def generate_random_time(number_of_secs):
@@ -117,13 +113,6 @@ with uc.Chrome(service=SERVICE, options=options, use_subprocess=True) as driver:
     driver.switch_to.window(driver.window_handles[1])   # Switches to the new window to input Google login details
     email_address()    # inputs the email and clicks next
     password = WebDriverWait(driver, DELAY * 3).until(ec.presence_of_element_located((By.NAME, "Passwd")))
-    # try:
-    #     password = WebDriverWait(driver, DELAY*3).until(ec.presence_of_element_located((By.NAME, "Passwd")))
-    # except TimeoutException:
-    #     try_again = driver.find_element(By.CLASS_NAME, "VfPpkd-mRLv6")
-    #     driver.execute_script("arguments[0].click();", try_again)
-    #     email_address()
-    #     password = WebDriverWait(driver, DELAY * 3).until(ec.presence_of_element_located((By.NAME, "Passwd")))
     driver.execute_script("arguments[0].click();", password)   # Clicks the password field
     time.sleep(DELAY - generate_random_time(LONG))   # delay
     password.clear()  # Clears the password field
@@ -147,12 +136,12 @@ with uc.Chrome(service=SERVICE, options=options, use_subprocess=True) as driver:
     except NoSuchElementException:
         pass
     count = 0
-    driver.implicitly_wait(DELAY * (LONG + DELAY))
+    driver.implicitly_wait(DELAY * (SHORT + DELAY))
     mouse_pointer = ActionChains(driver)     # activates the mouse pointer
     for index in range(1, number_of_swipes):
         matched = None
         count += 1
-        driver.implicitly_wait(DELAY * 2)
+        driver.implicitly_wait(DELAY)
         WebDriverWait(driver, DELAY ** SHORT).until(ec.element_to_be_clickable(driver.find_element(By.CSS_SELECTOR,
                                                                                                    ".Bd button path")))
         slide_container = driver.find_elements(By.CSS_SELECTOR, ".recsCardboard__cards .StretchedBox")
@@ -176,7 +165,7 @@ with uc.Chrome(service=SERVICE, options=options, use_subprocess=True) as driver:
                     try:
                         proximity_from_me = int(get_distance(ind).split(" ")[0])  # actual distance value
                         print(f"Proximity is: {proximity_from_me}")
-                    except ValueError:
+                    except AttributeError:
                         pass
                 elif ind == 2 and proximity_from_me is None:
                     try:
@@ -184,6 +173,15 @@ with uc.Chrome(service=SERVICE, options=options, use_subprocess=True) as driver:
                         print(f"Proximity is: {proximity_from_me}")
                     except ValueError:
                         proximity_from_me = max_distance * 2  # arbitrary value set when no distance value was retrieved
+                elif ind == 2 and proximity_from_me is not None:
+                    try:
+                        new_distance = int(get_distance(ind).split(" ")[0])  # actual distance value
+                        if proximity_from_me < new_distance:    # this gets rid of stale data
+                            proximity_from_me = new_distance
+                        else:
+                            pass
+                    except AttributeError:
+                        pass
                 elif proximity_from_me is None:
                     proximity_from_me = max_distance * 2   # arbitrary value set when no distance value was retrieved
                 mouse_pointer.move_to_element(next_previous[-1]).click().perform()
@@ -197,66 +195,42 @@ with uc.Chrome(service=SERVICE, options=options, use_subprocess=True) as driver:
             mouse_pointer.move_to_element(buttons[3]).click().perform()    # Click Like button
         else:
             mouse_pointer.move_to_element(buttons[1]).click().perform()  # Click Dislike button
+        # This section handles popups to add Tinder to the Home screen
         try:
             new_buttons = driver.find_elements(By.CSS_SELECTOR, ".c1p6lbu0 .w1u9t036 .l17p5q9z")
-            # for button in new_buttons:
-            #     if button.text == "Not interested":
-            #         print(button.text)
-            #         mouse_pointer.move_to_element(button).click().perform()
             not_interested = [mouse_pointer.move_to_element(button).click().perform()
                               for button in new_buttons if button.text == "Not interested"]
         except NoSuchElementException:
             pass
-        # try:
-        #     matched = driver.find_element(By.CLASS_NAME, "StretchedBox")
-        #     print(matched)
-        #     driver.implicitly_wait(DELAY*2)
-        # except NoSuchElementException:
-        #     pass
-        # else:
-        #     if matched:
-        #         print(f"Her name is: {name.text}")
-        #         chat_with_her = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[2]/main/div/div[1]/div/div[3]/div[3]/form/textarea')
-        #         driver.execute_script("arguments[0].click();", chat_with_her)
-        #         chat_with_her.send_keys(f"Hi {name.text}, I'm {MY_NAME}.")
-        #         chat_with_her.send_keys(Keys.RETURN)
-        #         time.sleep(DELAY - generate_random_time(LONG))
-        #         chat_with_her.send_keys(f"{name.text} with the beautiful smile.")
-        #         chat_with_her.send_keys(Keys.ENTER)
-        #         time.sleep(DELAY*2 - generate_random_time(SHORT))
-        #         try:
-        #             do_not_subscribe = driver.find_element(By.CLASS_NAME, "close")
-        #             driver.execute_script("arguments[0].click();", do_not_subscribe)
-        #         except NoSuchElementException:
-        #             pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# options.add_argument("window-size=1200x600")
-# options.add_argument("disable-infobars")
-# options.add_argument("--disable-extensions")
-# options.add_argument = {"args": ['--disable-web-security', '--user-data-dir', '--allow-running-insecure-content']}
-# options.add_experimental_option("debuggerAddress", "localhost: 8797")
-# options.headless = True
-# options.add_argument("--profile-directory=Default")
-# options.add_argument("--disable-plugins-discovery")
-# options.add_argument("--incognito")
-# options.add_argument("user_agent=DN")
+        time.sleep(generate_random_time(SHORT+1))
+        # This section initiates a conversation with your date when a match is found
+        try:
+            narrow_down = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[2]/main/div/div[1]/div')
+            divs_matched = narrow_down.find_elements(By.TAG_NAME, "div")
+            name_list = []
+            for div in divs_matched:
+                print(div.text)
+                if "likes you too!" in div.text:
+                    form_matched = narrow_down.find_element(By.TAG_NAME, "form")
+                    matched_name = form_matched.find_element(By.TAG_NAME, "label").text.split(" ")[0]
+                    updated_name = div.text.split(" ")[0]
+                    name_list.append(updated_name)
+                    print(f"Compare these two: {updated_name} and {matched_name}")
+                    chat_with_her = form_matched.find_element(By.TAG_NAME, "textarea")
+                    mouse_pointer.click(on_element=chat_with_her).perform()
+                    chat_with_her.clear()
+                    time.sleep(DELAY - generate_random_time(LONG))
+                    try:
+                        chat_with_her.send_keys(f"Hi {updated_name}, I'm {MY_NAME}.")
+                        chat_with_her.send_keys(Keys.RETURN)
+                        chat_with_her.send_keys(f"{updated_name} with the beautiful smile.")
+                    except StaleElementReferenceException:
+                        chat_with_her.send_keys(f"Hi {name_list[-1]}, I'm {MY_NAME}.")
+                        chat_with_her.send_keys(Keys.RETURN)
+                        chat_with_her.send_keys(f"{name_list[-1]} with the beautiful smile.")
+                    time.sleep(generate_random_time(DELAY))
+                    chat_with_her.send_keys(Keys.ENTER)
+                    time.sleep(DELAY * 2 - generate_random_time(SHORT))
+                    break
+        except NoSuchElementException:
+            pass
