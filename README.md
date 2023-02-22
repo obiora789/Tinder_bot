@@ -21,8 +21,8 @@ This bot automates the process of finding a date on Tinder, by logging into Tind
   <li>Populate the environment variables as stated below</li>
   <ul>
     <li>CHROME_PATH=pathToChromeDriverOnYourPC</li>
-    <li>TINDER_USERNAME=twitterUsername</li>
-    <li>TINDER_PASSWORD=twitterPassword</li>
+    <li>TINDER_USERNAME=tinderUsername</li>
+    <li>TINDER_PASSWORD=tinderPassword</li>
     <li>NAME=yourTinderNameToBeUsedToInitiateAConversationWhenAMatchIsFound</li>
   </ul>
   <li>That's all you need to do for now.😉</li>
