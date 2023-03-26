@@ -5,6 +5,7 @@ This bot automates the process of finding a date on Tinder, by logging into Tind
 <ul>
   <li>Python 3.8 or higher.</li>
   <li>Pycharm 2022.3.2 or higher.</li>
+  <li>Chrome Web browser. This app was designed using Chrome 109.0.5414.75. Use this or earlier but no later than Chrome 110.</li>
   <li>Selenium Webdriver(Chrome)</li>
   <li>Install and Import Selenium Undetected Chrome Driver.</li>
 </ul>
